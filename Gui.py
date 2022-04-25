@@ -40,6 +40,7 @@ class MainWindow(QDialog):
         loadUi("gui2.ui",self)
         self.paths = ["","","","","","","",""]
         self.lines = ["","",""]
+        self.click_status = False
 
 
         self.comboBox1.addItem("No") 
@@ -80,15 +81,19 @@ class MainWindow(QDialog):
         Function behind the Go button. Starts the analysis.
 
         """
-        print(type(self.filenameSp),self.filenameSp.text())
-        if self.filenameSp.text() != '' or self.filenameRef.text() != '' or self.epitopedataSp.text() != '' or self.epitopedataRef.text() != '': # check if the User selected the data
-            if not os.path.exists(self.outputP.text() + "/" + self.jobname.text()): # check if the jobname already exist
-                self.startProgram(self.lines[2],self.paths[2],self.paths[3],self.paths[1],self.paths[0],self.lines[0],self.paths[5],self.lines[1],self.paths[4], self.jobname.text(), self.paths[6], self.paths[7], self.refname.text(), self.queryname.text())
-                self.gotoScreen2()
+        if self.click_status:
+            if self.filenameSp.text() != '' or self.filenameRef.text() != '' or self.epitopedataSp.text() != '' or self.epitopedataRef.text() != '': # check if the User selected the data
+                if not os.path.exists(self.outputP.text() + "/" + self.jobname.text()): # check if the jobname already exist
+                    self.gotoScreen2()
+                    print('Start')
+                    self.startProgram(self.lines[2],self.paths[2],self.paths[3],self.paths[1],self.paths[0],self.lines[0],self.paths[5],self.lines[1],self.paths[4], self.jobname.text(), self.paths[6], self.paths[7], self.refname.text(), self.queryname.text())
+                else:
+                    self.show_popup()
             else:
-                self.show_popup()
+                self.show_popup('File-Error', 'Please select sequences or epitope data')
         else:
-            self.show_popup()
+            self.show_popup('Use-Button Error', 'Please select Use-Button')
+
 
 
 
@@ -147,15 +152,15 @@ class MainWindow(QDialog):
 
 
 
-    def show_popup(self):
+    def show_popup(self,window_titel='Error job name',message_text = 'Please rename your job name'):
 
         """
         Pop up warning window for still existing jobnames.
 
         """
         msg = QMessageBox()
-        msg.setWindowTitle("Error job name")
-        msg.setText('Falsch!!!!!!!')
+        msg.setWindowTitle(window_titel)
+        msg.setText(message_text)
 
         x = msg.exec_()
 
@@ -173,7 +178,7 @@ class MainWindow(QDialog):
         If the Use-button is pressed, the advanced settings are applied.
 
         """
-
+        self.click_status = True
         self.lines[0] = self.comboBox1.currentText()
         self.lines[1] = self.showplots.text()
         self.lines[2] = self.outputP.text()
